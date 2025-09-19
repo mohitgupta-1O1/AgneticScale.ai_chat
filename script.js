@@ -23,6 +23,8 @@ class ChatApp {
         this.sidebar = document.getElementById('sidebar');
         this.sidebarToggle = document.getElementById('sidebarToggle');
         this.greeting = document.getElementById('greeting');
+        this.addBtn = document.getElementById('addBtn');
+        this.addOptionsPopup = document.getElementById('addOptionsPopup');
     }
 
     initializeState() {
@@ -54,6 +56,16 @@ class ChatApp {
             wsUrl: 'wss://api.elevenlabs.io/v1/convai/conversation'
         };
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const agentIdFromUrl = urlParams.get('agentid');
+
+        if (agentIdFromUrl) {
+            this.config.agentId = agentIdFromUrl;
+            console.log("Agent ID from URL:", agentIdFromUrl);
+        } else {
+            console.log("No Agent ID in URL, using default.");
+        }
+
         if (this.isDemoMode) {
             this.updateStatus('Demo Mode');
             this.setInputEnabled(true);
@@ -80,6 +92,18 @@ class ChatApp {
         // this.themeSwitcher.addEventListener('click', () => this.toggleTheme());
         // this.endChatBtn.addEventListener('click', () => this.endChat());
         this.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+
+        this.addBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.addOptionsPopup.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!this.addBtn.contains(event.target) && !this.addOptionsPopup.contains(event.target)) {
+                this.addOptionsPopup.classList.remove('show');
+            }
+        });
+
         this.loadTheme();
     }
 
@@ -358,4 +382,6 @@ class ChatApp {
 document.addEventListener('DOMContentLoaded', () => {
     const app = new ChatApp();
     app.setRandomGreeting();
+    console.log("Current URL:", window.location.href);
+    console.log("Using Agent ID:", app.config.agentId);
 });
